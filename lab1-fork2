@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+
+int main(void)
+
+{
+    pid_t pid1, pid2;
+    int rv1, rv2;
+
+    switch(pid1 = fork())
+    {
+        case -1:
+            perror("fork");
+            exit(1);
+
+        case 0:
+            printf(" CHILD1: This is the 1st CHILD process!\n");
+            printf(" CHILD1: My PID is %d\n", getpid());
+            printf(" CHILD1: My parent's PID is %d\n", getppid());
+            printf(" CHILD1: Enter my exit status (and make it small): ");
+            scanf(" %d", &rv1);
+            printf(" CHILD1: I'm outta here!\n");
+            exit(rv1);
+
+        default:
+            printf("PARENT: This is the parent process.\n");
+            printf("PARENT: My PID is %d\n", getpid());
+            printf("PARENT: My 1st child's PID is %d\n", pid1);
+            printf("PARENT: Waiting for 1st child to exit()...\n");
+            wait(&rv1);
+            printf("PARENT: I'm outta here!\n");
+     }
+
+
+     switch(pid2 = fork())
+     {
+        case -1:
+            perror("fork");
+            exit(1);
+
+        case 0:
+            printf(" CHILD2: This is the 2nd CHILD process!\n");
+            printf(" CHILD2: My PID is %d\n", getpid());
+            printf(" CHILD2: My parent's PID is %d\n", getppid());
+            printf(" CHILD2: Enter my exit status (and make it small): ");
+            scanf(" %d", &rv2);
+            printf(" CHILD2: I'm outta here!\n");
+            exit(rv2);
+
+        default:
+            printf("PARENT: This is the parent process.\n");
+            printf("PARENT: My PID is %d\n", getpid());
+            printf("PARENT: My 2nd child's PID is %d\n", pid2);
+            wait(&rv2);
+            printf("PARENT: I'm outta here!\n");
+     }
+
+            printf("PARENT: My 1st child's exit status is: %d\n", WEXITSTATUS(rv1));
+
+        return 0;
+}
